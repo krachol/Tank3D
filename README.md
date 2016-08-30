@@ -1,6 +1,7 @@
 # Tank3D
 
 Compilation of the game requires following libraries to be installed:
+
 1. OpenGL
 2. GLUT
 3. GLEW
