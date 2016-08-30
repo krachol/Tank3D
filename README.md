@@ -1,2 +1,9 @@
 # Tank3D
-Game about tank battles for Computer Graphics and Visualisation course
+
+In order to run the game you have to create build folder run cmake and then make run.
+
+```
+mkdir build && cd build
+cmake ..
+make run
+```
