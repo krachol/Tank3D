@@ -1,0 +1,1 @@
+file(COPY ${PROJECT_SOURCE_DIR}/Resources DESTINATION .)
