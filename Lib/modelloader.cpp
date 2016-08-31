@@ -20,6 +20,7 @@ using glm::vec3;
 
 
 namespace Models {
+
     //Constructor for ObjModel class
     //Reads obj file and populates 
     //VertexCount and vertices, normals, texCoords,
