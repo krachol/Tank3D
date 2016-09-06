@@ -1,4 +1,4 @@
-#version 150
+#version 330
 
 //Zmienne jednorodne
 uniform mat4 P;

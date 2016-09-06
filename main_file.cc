@@ -256,11 +256,11 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y) {
 
 int main(void)
 {
-    Models::ObjModel mymodel("TigerII.obj");
-    vertices = mymodel.vertices;
-    normals = mymodel.vertexNormals;
-    colors = mymodel.colors;
-    vertexCount = mymodel.vertexCount;
+    Models::ObjModel tank("TigerII.obj");
+    vertices = tank.vertices;
+    normals = tank.vertexNormals;
+    colors = tank.colors;
+    vertexCount = tank.vertexCount;
 
     GLFWwindow* window; //Wskaźnik na obiekt reprezentujący okno
 
