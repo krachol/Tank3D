@@ -79,10 +79,10 @@ GLuint makeBuffer(void *data, int vertexCount, int vertexSize);
 
 void key_callback(GLFWwindow *, int key, int, int action, int) {
     if (action == GLFW_PRESS) {
-        if (key == GLFW_KEY_LEFT) speed_y = (float) 3.14;
-        if (key == GLFW_KEY_RIGHT) speed_y = -3.14;
-        if (key == GLFW_KEY_UP) speed = 1;
-        if (key == GLFW_KEY_DOWN) speed = -1;
+        if (key == GLFW_KEY_LEFT) speed_y = (float) -3.14;
+        if (key == GLFW_KEY_RIGHT) speed_y = 3.14;
+        if (key == GLFW_KEY_UP) speed = 15;
+        if (key == GLFW_KEY_DOWN) speed = -15;
     }
 
 
@@ -246,11 +246,15 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y) {
     glEnd();
 
     //Wylicz macierz rzutowania
-    glm::mat4 P = glm::perspective(50 * PI / 180, 1.0f, 1.0f, 50.0f); 
+    glm::mat4 P = glm::perspective(50 * PI / 180, 1.0f, 1.0f, 50.0f);
+
+    glm::mat4 rotation = mat4(1.f);
+    rotation = rotate(rotation, angle_y, glm::vec3(0,1,0));
+    glm::vec3 cameraPos = glm::vec3(glm::vec4(dist_x, 5.0f, dist_z-15.0f, 0.f)*rotation );
 
     glm::mat4 V = glm::lookAt( //Wylicz macierz widoku
-            glm::vec3(0.0f, 10.0f, -25.0f),
-            glm::vec3(0.0f, 0.0f, 0.0f),
+            cameraPos,
+            glm::vec3(dist_x, 0.0f, dist_z),
             glm::vec3(0.0f, 1.0f, 0.0f));
 
     //Wylicz macierz modelu rysowanego obiektu
@@ -343,8 +347,8 @@ int main(void)
         //jaki upłynął od poprzedniej klatki
         angle_y += speed_y*glfwGetTime();
 
-        dist_x += speed*sin(angle_y)*0.5;
-        dist_z += speed*cos(angle_y)*0.5;
+        dist_x += speed*sin(angle_y) * glfwGetTime();
+        dist_z += speed*cos(angle_y) * glfwGetTime();
         glfwSetTime(0); //Wyzeruj licznik czasu
         drawScene(window,angle_x,angle_y); //Wykonaj procedurę rysującą
         //Wykonaj procedury callback w zalezności od zdarzeń jakie zaszły.
