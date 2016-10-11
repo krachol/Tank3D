@@ -79,8 +79,8 @@ GLuint makeBuffer(void *data, int vertexCount, int vertexSize);
 
 void key_callback(GLFWwindow *, int key, int, int action, int) {
     if (action == GLFW_PRESS) {
-        if (key == GLFW_KEY_LEFT) speed_y = (float) -3.14;
-        if (key == GLFW_KEY_RIGHT) speed_y = 3.14;
+        if (key == GLFW_KEY_LEFT) speed_y = (float) 3.14;
+        if (key == GLFW_KEY_RIGHT) speed_y = -3.14;
         if (key == GLFW_KEY_UP) speed = 1;
         if (key == GLFW_KEY_DOWN) speed = -1;
     }
@@ -216,7 +216,7 @@ void drawObject(GLuint vao, ShaderProgram *shaderProgram,
             glm::value_ptr(mM));
 
     //Przekazanie współrzędnych źródła światła do zmiennej jednorodnej lightPos0
-    glUniform4f(shaderProgram->getUniformLocation("lightPos0"), 0,0,-5,1); 
+    glUniform4f(shaderProgram->getUniformLocation("lightPos0"), 0,0,-15,0);
 
     //Uaktywnienie VAO i tym samym uaktywnienie predefiniowanych 
     //w tym VAO powiązań slotów atrybutów z tablicami z danymi
@@ -249,7 +249,7 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y) {
     glm::mat4 P = glm::perspective(50 * PI / 180, 1.0f, 1.0f, 50.0f); 
 
     glm::mat4 V = glm::lookAt( //Wylicz macierz widoku
-            glm::vec3(0.0f, 0.0f, -15.0f),
+            glm::vec3(0.0f, 10.0f, -25.0f),
             glm::vec3(0.0f, 0.0f, 0.0f),
             glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -343,8 +343,8 @@ int main(void)
         //jaki upłynął od poprzedniej klatki
         angle_y += speed_y*glfwGetTime();
 
-        dist_x += speed*sin(angle_y);
-        dist_z += speed*cos(angle_y);
+        dist_x += speed*sin(angle_y)*0.5;
+        dist_z += speed*cos(angle_y)*0.5;
         glfwSetTime(0); //Wyzeruj licznik czasu
         drawScene(window,angle_x,angle_y); //Wykonaj procedurę rysującą
         //Wykonaj procedury callback w zalezności od zdarzeń jakie zaszły.
