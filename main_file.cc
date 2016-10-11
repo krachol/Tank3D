@@ -250,9 +250,9 @@ void drawScene(GLFWwindow* window, float , float angle_y) {
     //Wylicz macierz rzutowania
     glm::mat4 P = glm::perspective(50 * PI / 180, 1.0f, 1.0f, 50.0f);
 
-    glm::mat4 rotation = mat4(1.f);
-    rotation = rotate(rotation, angle_y, glm::vec3(0,1,0));
-    glm::vec3 cameraPos = glm::vec3(glm::vec4(dist_x, 5.0f, dist_z-15.0f, 0.f)*rotation );
+    //glm::mat4 rotation = mat4(1.f);
+    //rotation = rotate(rotation, angle_y, glm::vec3(0,1,0));
+    glm::vec3 cameraPos = glm::vec3(dist_x, 5.0f, dist_z-15.0f);
 
     glm::mat4 V = glm::lookAt( //Wylicz macierz widoku
             cameraPos,
