@@ -19,6 +19,7 @@
 
 #define GLM_FORCE_RADIANS
 
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -30,6 +31,7 @@
 #include "lodepng.h"
 #include "shaderprogram.h"
 #include <modelloader.h>
+#include <math.h>
 
 #include <iostream>
 
@@ -38,6 +40,10 @@ using namespace glm;
 
 float speed_x = 0; // [radiany/s]
 float speed_y = 0; // [radiany/s]
+
+float dist_x = 0;
+float dist_z = 0;
+int speed = 0;
 
 //Uchwyty na shadery
 //Wskaźnik na obiekt reprezentujący program cieniujący.
@@ -75,16 +81,16 @@ void key_callback(GLFWwindow *, int key, int, int action, int) {
     if (action == GLFW_PRESS) {
         if (key == GLFW_KEY_LEFT) speed_y = (float) -3.14;
         if (key == GLFW_KEY_RIGHT) speed_y = 3.14;
-        if (key == GLFW_KEY_UP) speed_x = (float) -3.14;
-        if (key == GLFW_KEY_DOWN) speed_x = 3.14;
+        if (key == GLFW_KEY_UP) speed = 1;
+        if (key == GLFW_KEY_DOWN) speed = -1;
     }
 
 
     if (action == GLFW_RELEASE) {
         if (key == GLFW_KEY_LEFT) speed_y = 0;
         if (key == GLFW_KEY_RIGHT) speed_y = 0;
-        if (key == GLFW_KEY_UP) speed_x = 0;
-        if (key == GLFW_KEY_DOWN) speed_x = 0;
+        if (key == GLFW_KEY_UP) speed = 0;
+        if (key == GLFW_KEY_DOWN) speed = 0;
     }
 }
 
@@ -229,7 +235,15 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y) {
     //************Tutaj umieszczaj kod rysujący obraz******************l
 
     //Wykonaj czyszczenie bufora kolorów
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT); 
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+    //draw flat surface
+    glBegin(GL_QUADS);
+    glVertex4f(-1, -1, 0, 0);
+    glVertex4f(-1, 1, 0, 0);
+    glVertex4f(1, 1, 0, 0);
+    glVertex4f(1, -1, 0, 0);
+    glEnd();
 
     //Wylicz macierz rzutowania
     glm::mat4 P = glm::perspective(50 * PI / 180, 1.0f, 1.0f, 50.0f); 
@@ -239,11 +253,14 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y) {
             glm::vec3(0.0f, 0.0f, 0.0f),
             glm::vec3(0.0f, 1.0f, 0.0f));
 
-
     //Wylicz macierz modelu rysowanego obiektu
-    glm::mat4 M = glm::mat4(1.0f); 
-    M = glm::rotate(M, angle_x, glm::vec3(1, 0, 0)); 
-    M = glm::rotate(M, angle_y, glm::vec3(0, 1, 0)); 
+
+
+    glm::mat4 M = glm::mat4(1.0f);
+    M = glm::translate(M, glm::vec3(dist_x, 0, dist_z));
+    //M = glm::rotate(M, angle_x, glm::vec3(1, 0, 0));
+    M = glm::rotate(M, angle_y, glm::vec3(0, 1, 0));
+
 
     //Narysuj obiekt
     drawObject(vao,shaderProgram,P,V,M);
@@ -264,33 +281,48 @@ int main(void)
 
     GLFWwindow* window; //Wskaźnik na obiekt reprezentujący okno
 
-    glfwSetErrorCallback(error_callback);//Zarejestruj procedurę obsługi błędów
-
     if (!glfwInit()) { //Zainicjuj bibliotekę GLFW
         fprintf(stderr, "Nie można zainicjować GLFW.\n");
         exit(EXIT_FAILURE); 
     }
+#ifdef __APPLE__
+    glfwWindowHint(GLFW_SAMPLES, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#endif
+
+    glfwSetErrorCallback(error_callback);//Zarejestruj procedurę obsługi błędów
 
     //Utwórz okno 500x500 o tytule "OpenGL" i kontekst OpenGL. 
     window = glfwCreateWindow(500, 500, "OpenGL", NULL, NULL);  
 
-
-    if (!window) //Jeżeli okna nie udało się utworzyć, to zamknij program
+    if (window == NULL) //Jeżeli okna nie udało się utworzyć, to zamknij program
     {
         fprintf(stderr, "Nie można utworzyć okna.\n");
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
 
+
     //Od tego momentu kontekst okna staje się aktywny 
     //i polecenia OpenGL będą dotyczyć właśnie jego.
     glfwMakeContextCurrent(window); 
     //Czekaj na 1 powrót plamki przed pokazaniem ukrytego bufora
     glfwSwapInterval(1); 
-
+/*
     if (glewInit() != GLEW_OK) { //Zainicjuj bibliotekę GLEW
         fprintf(stderr, "Nie można zainicjować GLEW.\n");
         exit(EXIT_FAILURE);
+    }
+*/
+    // Initialize GLEW
+    GLenum err;
+    glewExperimental = GL_TRUE; // Needed for core profile
+    if ((err = glewInit()) != GLEW_OK) {
+        std::cout << glewGetErrorString(err) << std::endl;
+        return -1;
     }
 
     initOpenGLProgram(window); //Operacje inicjujące
@@ -309,7 +341,10 @@ int main(void)
         angle_x += speed_x*glfwGetTime(); 
         //Zwiększ kąt o prędkość kątową razy czas 
         //jaki upłynął od poprzedniej klatki
-        angle_y += speed_y*glfwGetTime(); 
+        angle_y += speed_y*glfwGetTime();
+
+        dist_x += speed*sin(angle_y);
+        dist_z += speed*cos(angle_y);
         glfwSetTime(0); //Wyzeruj licznik czasu
         drawScene(window,angle_x,angle_y); //Wykonaj procedurę rysującą
         //Wykonaj procedury callback w zalezności od zdarzeń jakie zaszły.
