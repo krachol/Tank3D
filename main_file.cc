@@ -4,13 +4,11 @@
    Licencji Publicznej GNU, wydanej przez Fundację Wolnego
    Oprogramowania - według wersji 2 tej Licencji lub(według twojego
    wyboru) którejś z późniejszych wersji.
-
    Niniejszy program rozpowszechniany jest z nadzieją, iż będzie on
    użyteczny - jednak BEZ JAKIEJKOLWIEK GWARANCJI, nawet domyślnej
    gwarancji PRZYDATNOŚCI HANDLOWEJ albo PRZYDATNOŚCI DO OKREŚLONYCH
    ZASTOSOWAŃ.W celu uzyskania bliższych informacji sięgnij do
    Powszechnej Licencji Publicznej GNU.
-
    Z pewnością wraz z niniejszym programem otrzymałeś też egzemplarz
    Powszechnej Licencji Publicznej GNU(GNU General Public License);
    jeśli nie - napisz do Free Software Foundation, Inc., 59 Temple
@@ -47,16 +45,16 @@ int speed = 0;
 
 //Uchwyty na shadery
 //Wskaźnik na obiekt reprezentujący program cieniujący.
-ShaderProgram *shaderProgram; 
+ShaderProgram *shaderProgram;
 
 //Uchwyty na VAO i bufory wierzchołków
 GLuint vao;
 //Uchwyt na bufor VBO przechowujący tablicę współrzędnych wierzchołków
-GLuint bufVertices; 
+GLuint bufVertices;
 //Uchwyt na bufor VBO przechowujący tablicę kolorów
-GLuint bufColors;  
+GLuint bufColors;
 //Uchwyt na bufor VBO przechowujący tablickę wektorów normalnych
-GLuint bufNormals; 
+GLuint bufNormals;
 
 //Kostka
 /* float* vertices=Models::CubeInternal::vertices; */
@@ -116,36 +114,36 @@ GLuint makeBuffer(void *data, int vertexCount, int vertexSize) {
 
 //Tworzy bufor VBO z tablicy
 
-//Przypisuje bufor VBO do atrybutu 
+//Przypisuje bufor VBO do atrybutu
 void assignVBOtoAttribute(ShaderProgram *shaderProgram,
-        const char* attributeName, GLuint bufVBO, int vertexSize) {
+                          const char* attributeName, GLuint bufVBO, int vertexSize) {
     //Pobierz numery slotów dla atrybutu
-    GLuint location=shaderProgram->getAttribLocation(attributeName); 
-    glBindBuffer(GL_ARRAY_BUFFER,bufVBO);  //Uaktywnij uchwyt VBO 
+    GLuint location=shaderProgram->getAttribLocation(attributeName);
+    glBindBuffer(GL_ARRAY_BUFFER,bufVBO);  //Uaktywnij uchwyt VBO
     //Włącz używanie atrybutu o numerze slotu zapisanym w zmiennej location
-    glEnableVertexAttribArray(location); 
+    glEnableVertexAttribArray(location);
     //Dane do slotu location mają być brane z aktywnego VBO
-    glVertexAttribPointer(location,vertexSize,GL_FLOAT, GL_FALSE, 0, NULL); 
+    glVertexAttribPointer(location,vertexSize,GL_FLOAT, GL_FALSE, 0, NULL);
 }
 
 
 //Procedura inicjująca
 void initOpenGLProgram(GLFWwindow* window) {
     //***Tutaj umieszczaj kod, który należy wykonać raz, na początku programu***
-    glClearColor(0, 0, 0, 1); //Czyść ekran na czarno	
+    glClearColor(0, 0, 0, 1); //Czyść ekran na czarno
     glEnable(GL_DEPTH_TEST); //Włącz używanie Z-Bufora
     //Zarejestruj procedurę obsługi klawiatury
     glfwSetKeyCallback(window, key_callback);
 
 
-    //Wczytaj program cieniujący 
-    shaderProgram=new ShaderProgram("vshader.txt",NULL,"fshader.txt"); 
+    //Wczytaj program cieniujący
+    shaderProgram=new ShaderProgram("vshader.txt",NULL,"fshader.txt");
 
 
     //*****Przygotowanie do rysowania pojedynczego obiektu*******
     //Zbuduj VBO z danymi obiektu do narysowania
     //VBO ze współrzędnymi wierzchołków
-    bufVertices=makeBuffer(vertices, vertexCount, sizeof(float)*4); 
+    bufVertices=makeBuffer(vertices, vertexCount, sizeof(float)*4);
     //VBO z kolorami wierzchołków
     bufColors=makeBuffer(colors, vertexCount, sizeof(float)*4);
     //VBO z wektorami normalnymi wierzchołków
@@ -153,16 +151,16 @@ void initOpenGLProgram(GLFWwindow* window) {
 
     //Zbuduj VAO wiążący atrybuty z konkretnymi VBO
     //Wygeneruj uchwyt na VAO i zapisz go do zmiennej globalnej
-    glGenVertexArrays(1,&vao); 
+    glGenVertexArrays(1,&vao);
 
     glBindVertexArray(vao); //Uaktywnij nowo utworzony VAO
 
     //"vertex" odnosi się do deklaracji "in vec4 vertex;" w vertex shaderze
-    assignVBOtoAttribute(shaderProgram,"vertex",bufVertices,4); 
+    assignVBOtoAttribute(shaderProgram,"vertex",bufVertices,4);
     //"color" odnosi się do deklaracji "in vec4 color;" w vertex shaderze
-    assignVBOtoAttribute(shaderProgram,"color",bufColors,4); 
+    assignVBOtoAttribute(shaderProgram,"color",bufColors,4);
     //"normal" odnosi się do deklaracji "in vec4 normal;" w vertex shaderze
-    assignVBOtoAttribute(shaderProgram,"normal",bufNormals,4); 
+    assignVBOtoAttribute(shaderProgram,"normal",bufNormals,4);
 
     glBindVertexArray(0); //Dezaktywuj VAO
     //******Koniec przygotowania obiektu************
@@ -181,24 +179,26 @@ void freeOpenGLProgram() {
 
 }
 
-void drawObject(GLuint vao, ShaderProgram *shaderProgram, 
-        mat4 mP, mat4 mV, mat4 mM) {
+void drawObject(GLuint vao, ShaderProgram *shaderProgram,
+                mat4 mP, mat4 mV, mat4 mM) {
     //Włączenie programu cieniującego, który ma zostać użyty do rysowania
-    //ale chodzi o pokazanie, 
-    //W tym programie wystarczyłoby wywołać to raz, w setupShaders, 
+    //ale chodzi o pokazanie,
+    //W tym programie wystarczyłoby wywołać to raz, w setupShaders,
     //że mozna zmieniać program cieniujący podczas rysowania jednej sceny
     shaderProgram->use();
 
     //Przekaż do shadera macierze P,V i M.
     //W linijkach poniżej, polecenie:
-    //  shaderProgram->getUniformLocation("P") 
+    //  shaderProgram->getUniformLocation("P")
     //pobiera numer slotu odpowiadającego zmiennej jednorodnej o podanej nazwie
-    //UWAGA! "P" w powyższym poleceniu odpowiada deklaracji "uniform mat4 P;" 
-    //w vertex shaderze, 
+    //UWAGA! "P" w powyższym poleceniu odpowiada deklaracji "uniform mat4 P;"
+    //w vertex shaderze,
     //a mP w glm::value_ptr(mP) odpowiada argumentowi  "mat4 mP;" TYM pliku.
-    //Cała poniższa linijka przekazuje do zmiennej jednorodnej P w 
+    //Cała poniższa linijka przekazuje do zmiennej jednorodnej P w
     //vertex shaderze dane z argumentu mP niniejszej funkcji
     //Pozostałe polecenia działają podobnie.
+
+
     glUniformMatrix4fv(
             shaderProgram->getUniformLocation("P"),
             1,
@@ -216,22 +216,22 @@ void drawObject(GLuint vao, ShaderProgram *shaderProgram,
             glm::value_ptr(mM));
 
     //Przekazanie współrzędnych źródła światła do zmiennej jednorodnej lightPos0
-    glUniform4f(shaderProgram->getUniformLocation("lightPos0"), 0,0,-15,0);
+    glUniform4f(shaderProgram->getUniformLocation("lightPos0"), 0,0,-5,1);
 
-    //Uaktywnienie VAO i tym samym uaktywnienie predefiniowanych 
+    //Uaktywnienie VAO i tym samym uaktywnienie predefiniowanych
     //w tym VAO powiązań slotów atrybutów z tablicami z danymi
     glBindVertexArray(vao);
 
     //Narysowanie obiektu
     glDrawArrays(GL_TRIANGLES,0,vertexCount);
 
-    //Posprzątanie po sobie (niekonieczne w sumie jeżeli 
+    //Posprzątanie po sobie (niekonieczne w sumie jeżeli
     //korzystamy z VAO dla każdego rysowanego obiektu)
     glBindVertexArray(0);
 }
 
 //Procedura rysująca zawartość sceny
-void drawScene(GLFWwindow* window, float angle_x, float angle_y) {
+void drawScene(GLFWwindow* window, float , float angle_y) {
     //************Tutaj umieszczaj kod rysujący obraz******************l
 
     //Wykonaj czyszczenie bufora kolorów
@@ -250,13 +250,23 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y) {
 
     //glm::mat4 rotation = mat4(1.f);
     //rotation = rotate(rotation, angle_y, glm::vec3(0,1,0));
-    glm::vec3 cameraPos = glm::vec3(dist_x, 5.0f, dist_z-15.0f);
 
+    //follow cam
+    glm::vec3 cameraPos = glm::vec3(dist_x, 5.0f, dist_z-15.0f);
     glm::mat4 V = glm::lookAt( //Wylicz macierz widoku
             cameraPos,
             glm::vec3(dist_x, 0.0f, dist_z),
             glm::vec3(0.0f, 1.0f, 0.0f));
+    V = glm::translate(V, glm::vec3(dist_x, 0, dist_z));
+    V = glm::rotate(V, -angle_y, glm::vec3(0, 1, 0));
+    //steady cam
+    /*
+    glm::mat4 V = glm::lookAt(
+            glm::vec3(0.0f, 0.0f, -15.0f),
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            glm::vec3(0.0f, 1.0f, 0.0f));
 
+     */
     //Wylicz macierz modelu rysowanego obiektu
 
 
@@ -287,7 +297,7 @@ int main(void)
 
     if (!glfwInit()) { //Zainicjuj bibliotekę GLFW
         fprintf(stderr, "Nie można zainicjować GLFW.\n");
-        exit(EXIT_FAILURE); 
+        exit(EXIT_FAILURE);
     }
 #ifdef __APPLE__
     glfwWindowHint(GLFW_SAMPLES, 4);
@@ -299,8 +309,8 @@ int main(void)
 
     glfwSetErrorCallback(error_callback);//Zarejestruj procedurę obsługi błędów
 
-    //Utwórz okno 500x500 o tytule "OpenGL" i kontekst OpenGL. 
-    window = glfwCreateWindow(500, 500, "OpenGL", NULL, NULL);  
+    //Utwórz okno 500x500 o tytule "OpenGL" i kontekst OpenGL.
+    window = glfwCreateWindow(500, 500, "OpenGL", NULL, NULL);
 
     if (window == NULL) //Jeżeli okna nie udało się utworzyć, to zamknij program
     {
@@ -310,11 +320,11 @@ int main(void)
     }
 
 
-    //Od tego momentu kontekst okna staje się aktywny 
+    //Od tego momentu kontekst okna staje się aktywny
     //i polecenia OpenGL będą dotyczyć właśnie jego.
-    glfwMakeContextCurrent(window); 
+    glfwMakeContextCurrent(window);
     //Czekaj na 1 powrót plamki przed pokazaniem ukrytego bufora
-    glfwSwapInterval(1); 
+    glfwSwapInterval(1);
 /*
     if (glewInit() != GLEW_OK) { //Zainicjuj bibliotekę GLEW
         fprintf(stderr, "Nie można zainicjować GLEW.\n");
@@ -338,12 +348,12 @@ int main(void)
 
     //Główna pętla
     //Tak długo jak okno nie powinno zostać zamknięte
-    while (!glfwWindowShouldClose(window)) 
+    while (!glfwWindowShouldClose(window))
     {
-        //Zwiększ kąt o prędkość kątową razy 
+        //Zwiększ kąt o prędkość kątową razy
         //czas jaki upłynął od poprzedniej klatki
-        angle_x += speed_x*glfwGetTime(); 
-        //Zwiększ kąt o prędkość kątową razy czas 
+        angle_x += speed_x*glfwGetTime();
+        //Zwiększ kąt o prędkość kątową razy czas
         //jaki upłynął od poprzedniej klatki
         angle_y += speed_y*glfwGetTime();
 
@@ -352,7 +362,7 @@ int main(void)
         glfwSetTime(0); //Wyzeruj licznik czasu
         drawScene(window,angle_x,angle_y); //Wykonaj procedurę rysującą
         //Wykonaj procedury callback w zalezności od zdarzeń jakie zaszły.
-        glfwPollEvents(); 
+        glfwPollEvents();
     }
 
     freeOpenGLProgram();
@@ -361,4 +371,3 @@ int main(void)
     glfwTerminate(); //Zwolnij zasoby zajęte przez GLFW
     exit(EXIT_SUCCESS);
 }
-
